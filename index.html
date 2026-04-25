@@ -2,161 +2,89 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlashCam Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Filtres CSS */
+        /* Tes filtres CSS */
         .filter-none { filter: none; }
-        .filter-vintage { filter: sepia(0.6) contrast(1.1) brightness(0.9); }
-        .filter-bw { filter: grayscale(1) contrast(1.2); }
-        .filter-warm { filter: saturate(1.6) sepia(0.2) hue-rotate(-10deg); }
-        .filter-cool { filter: contrast(1.1) hue-rotate(180deg) brightness(1.1); }
-        
-        /* Empêcher le défilement élastique sur iOS */
-        body, html { position: fixed; width: 100%; height: 100%; overflow: hidden; }
-        
-        video { transform: scaleX(-1); object-fit: cover; }
+        .filter-vintage { filter: sepia(0.6) contrast(1.1); }
+        .filter-bw { filter: grayscale(1); }
+        .filter-warm { filter: saturate(1.6) sepia(0.2); }
+        .filter-cool { filter: contrast(1.1) hue-rotate(180deg); }
+
+        /* Pour cacher la scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Animation de flash */
-        .flash-active { animation: flashAnim 0.2s ease-out; }
-        @keyframes flashAnim {
-            0% { background-color: white; opacity: 1; }
-            100% { background-color: transparent; opacity: 0; }
-        }
+        
+        video { transform: scaleX(-1); } /* Effet miroir pour la selfie cam */
     </style>
 </head>
-<body class="bg-black text-white font-sans flex flex-col">
+<body class="bg-black text-white h-screen flex flex-col overflow-hidden">
 
-    <div id="flash" class="fixed inset-0 z-50 pointer-events-none"></div>
-
-    <header class="p-4 flex justify-between items-center border-b border-zinc-800 bg-black z-10">
-        <h1 class="text-xl font-bold tracking-tighter italic">FLASH<span class="text-yellow-400">CAM</span></h1>
-        <div id="status-badge" class="bg-yellow-400 text-black px-3 py-1 rounded-full text-[10px] font-bold uppercase">Mode Premium</div>
+    <header class="p-4 text-center font-bold text-xl tracking-widest border-b border-gray-800">
+        FLASHCAM PRO
     </header>
 
-    <main class="flex-1 relative bg-zinc-900 flex items-center justify-center overflow-hidden">
-        <video id="webcam" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
-        
-        <canvas id="capture-canvas" class="hidden"></canvas>
-
-        <div class="absolute bottom-6 w-full flex flex-col items-center gap-6">
-            <div class="flex gap-4 overflow-x-auto px-10 w-full no-scrollbar pb-2">
-                <button onclick="setFilter('filter-none', this)" class="filter-btn shrink-0 w-14 h-14 rounded-full border-2 border-yellow-400 bg-zinc-800 text-[10px] flex items-center justify-center">Normal</button>
-                <button onclick="setFilter('filter-vintage', this)" class="filter-btn shrink-0 w-14 h-14 rounded-full border-2 border-transparent bg-orange-900 text-[10px] flex items-center justify-center">Vintage</button>
-                <button onclick="setFilter('filter-bw', this)" class="filter-btn shrink-0 w-14 h-14 rounded-full border-2 border-transparent bg-zinc-500 text-[10px] flex items-center justify-center">N&B</button>
-                <button onclick="setFilter('filter-warm', this)" class="filter-btn shrink-0 w-14 h-14 rounded-full border-2 border-transparent bg-red-700 text-[10px] flex items-center justify-center">Chaud</button>
-                <button onclick="setFilter('filter-cool', this)" class="filter-btn shrink-0 w-14 h-14 rounded-full border-2 border-transparent bg-blue-700 text-[10px] flex items-center justify-center">Froid</button>
-            </div>
-
-            <button onclick="takePhoto()" class="group relative w-20 h-20 rounded-full border-4 border-white flex items-center justify-center hover:scale-105 transition-transform active:scale-95">
-                <div class="w-16 h-16 bg-white rounded-full"></div>
-            </button>
-        </div>
+    <main class="flex-1 relative flex items-center justify-center bg-gray-900">
+        <video id="video" autoplay playsinline class="w-full h-full object-cover filter-none"></video>
+        <canvas id="canvas" class="hidden"></canvas>
     </main>
 
-    <nav class="bg-black border-t border-zinc-800 pb-8 pt-4 flex justify-around items-center z-10">
-        <button class="flex flex-col items-center text-yellow-400">
-            <span class="text-2xl">📸</span>
-            <span class="text-[10px] font-medium">Caméra</span>
-        </button>
-        <button onclick="showProMessage('Messages')" class="flex flex-col items-center text-zinc-500">
-            <span class="text-2xl">💬</span>
-            <span class="text-[10px] font-medium">Messages</span>
-        </button>
-        <button onclick="showProMessage('Galerie')" class="flex flex-col items-center text-zinc-500">
-            <span class="text-2xl">🖼️</span>
-            <span class="text-[10px] font-medium">Galerie</span>
-        </button>
-        <button onclick="showProMessage('Profil')" class="flex flex-col items-center text-zinc-500">
-            <span class="text-2xl">👤</span>
-            <span class="text-[10px] font-medium">Profil</span>
-        </button>
-    </nav>
+    <div class="flex gap-4 p-4 overflow-x-auto no-scrollbar bg-black">
+        <button onclick="setFilter('filter-none')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase">Normal</button>
+        <button onclick="setFilter('filter-vintage')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-orange-200">Vintage</button>
+        <button onclick="setFilter('filter-bw')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-gray-400">N&B</button>
+        <button onclick="setFilter('filter-warm')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-red-300">Chaud</button>
+        <button onclick="setFilter('filter-cool')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-blue-300">Froid</button>
+    </div>
+
+    <footer class="p-8 flex justify-center items-center bg-black">
+        <button id="snap" class="w-20 h-20 bg-white rounded-full border-4 border-gray-400 active:scale-95 transition-transform"></button>
+    </footer>
 
     <script>
-        const video = document.getElementById('webcam');
-        const canvas = document.getElementById('capture-canvas');
-        const flash = document.getElementById('flash');
-        let currentFilter = 'filter-none';
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
 
-        // Initialisation propre de la caméra
+        // 1. Accéder à la caméra
         async function initCamera() {
-            const constraints = {
-                video: {
-                    facingMode: "user",
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                },
-                audio: false
-            };
-
             try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
                 video.srcObject = stream;
             } catch (err) {
-                console.error("Erreur d'accès à la caméra:", err);
-                document.body.innerHTML = `
-                    <div class="h-screen flex flex-col items-center justify-center p-10 text-center">
-                        <p class="text-red-500 mb-4">⚠️ Erreur : Caméra inaccessible</p>
-                        <p class="text-sm text-zinc-400">Veuillez autoriser l'accès à la caméra dans les réglages de votre navigateur.</p>
-                        <button onclick="location.reload()" class="mt-6 bg-white text-black px-6 py-2 rounded-full font-bold">Réessayer</button>
-                    </div>`;
+                alert("Erreur d'accès à la caméra : " + err);
             }
         }
 
-        // Gestion des filtres sans bug de style
-        function setFilter(filterName, el) {
-            currentFilter = filterName;
-            video.className = `absolute inset-0 w-full h-full object-cover ${filterName}`;
-            
-            // Mise à jour visuelle des boutons
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.replace('border-yellow-400', 'border-transparent'));
-            el.classList.replace('border-transparent', 'border-yellow-400');
+        // 2. Changer de filtre
+        function setFilter(filterClass) {
+            video.className = "w-full h-full object-cover " + filterClass;
         }
 
-        // Fonction de capture réelle
-        function takePhoto() {
-            // Effet visuel de flash
-            flash.classList.add('flash-active');
-            setTimeout(() => flash.classList.remove('flash-active'), 200);
-
-            // Dessiner l'image du flux vidéo sur le canvas
+        // 3. Prendre une photo
+        snap.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
             
-            // Appliquer le filtre au canvas
-            ctx.filter = getComputedStyle(video).filter;
+            // Appliquer le filtre au canvas pour la sauvegarde
+            context.filter = getComputedStyle(video).filter;
             
-            // Miroir inverse pour que la photo soit comme ce qu'on voit à l'écran
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
+            // Dessiner l'image (avec effet miroir)
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            // Télécharger l'image automatiquement
+            const link = document.createElement('a');
+            link.download = 'flashcam-photo.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
 
-            // Simulation d'enregistrement
-            const imageData = canvas.toDataURL("image/png");
-            console.log("Photo sauvegardée localement");
-            
-            // Notification Premium
-            const badge = document.getElementById('status-badge');
-            badge.innerText = "Photo Enregistrée !";
-            badge.classList.replace('bg-yellow-400', 'bg-green-500');
-            setTimeout(() => {
-                badge.innerText = "Mode Premium";
-                badge.classList.replace('bg-green-500', 'bg-yellow-400');
-            }, 2000);
-        }
-
-        function showProMessage(section) {
-            alert(`Félicitations ! Votre accès Premium vous permet d'accéder à la section ${section} dès son déploiement.`);
-        }
-
-        // Lancement au chargement
-        window.addEventListener('load', initCamera);
+        initCamera();
     </script>
 </body>
 </html>
