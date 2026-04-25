@@ -1,90 +1,40 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashCam Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Tes filtres CSS */
-        .filter-none { filter: none; }
-        .filter-vintage { filter: sepia(0.6) contrast(1.1); }
-        .filter-bw { filter: grayscale(1); }
-        .filter-warm { filter: saturate(1.6) sepia(0.2); }
-        .filter-cool { filter: contrast(1.1) hue-rotate(180deg); }
+body {
+  margin: 0;
+  overflow: hidden; /* Empêche le scroll vertical classique */
+}
 
-        /* Pour cacher la scrollbar */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        video { transform: scaleX(-1); } /* Effet miroir pour la selfie cam */
-    </style>
-</head>
-<body class="bg-black text-white h-screen flex flex-col overflow-hidden">
+.snap-container {
+  display: flex;
+  width: 300vw; /* 3 écrans de large */
+  height: 100vh;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory; /* Force l'arrêt sur chaque écran */
+}
 
-    <header class="p-4 text-center font-bold text-xl tracking-widest border-b border-gray-800">
-        FLASHCAM PRO
-    </header>
+.screen {
+  width: 100vw;
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-    <main class="flex-1 relative flex items-center justify-center bg-gray-900">
-        <video id="video" autoplay playsinline class="w-full h-full object-cover filter-none"></video>
-        <canvas id="canvas" class="hidden"></canvas>
-    </main>
+/* Couleurs de fond pour différencier */
+#chat { background-color: #ffffff; }
+#camera { background: transparent; } /* Ici tu mettras ton flux vidéo */
+#stories { background-color: #f7f7f7; }
 
-    <div class="flex gap-4 p-4 overflow-x-auto no-scrollbar bg-black">
-        <button onclick="setFilter('filter-none')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase">Normal</button>
-        <button onclick="setFilter('filter-vintage')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-orange-200">Vintage</button>
-        <button onclick="setFilter('filter-bw')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-gray-400">N&B</button>
-        <button onclick="setFilter('filter-warm')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-red-300">Chaud</button>
-        <button onclick="setFilter('filter-cool')" class="px-4 py-2 bg-gray-800 rounded-full text-xs uppercase text-blue-300">Froid</button>
-    </div>
-
-    <footer class="p-8 flex justify-center items-center bg-black">
-        <button id="snap" class="w-20 h-20 bg-white rounded-full border-4 border-gray-400 active:scale-95 transition-transform"></button>
-    </footer>
-
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const snap = document.getElementById('snap');
-
-        // 1. Accéder à la caméra
-        async function initCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-                video.srcObject = stream;
-            } catch (err) {
-                alert("Erreur d'accès à la caméra : " + err);
-            }
-        }
-
-        // 2. Changer de filtre
-        function setFilter(filterClass) {
-            video.className = "w-full h-full object-cover " + filterClass;
-        }
-
-        // 3. Prendre une photo
-        snap.addEventListener('click', () => {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            // Appliquer le filtre au canvas pour la sauvegarde
-            context.filter = getComputedStyle(video).filter;
-            
-            // Dessiner l'image (avec effet miroir)
-            context.translate(canvas.width, 0);
-            context.scale(-1, 1);
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Télécharger l'image automatiquement
-            const link = document.createElement('a');
-            link.download = 'flashcam-photo.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        });
-
-        initCamera();
-    </script>
-</body>
-</html>
+/* La barre de navigation fixe */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: white;
+}
