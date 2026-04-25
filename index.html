@@ -1,43 +1,38 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FlashCam - Premium</title>
+    <title>FlashCam Revolution</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .filter-vintage { filter: sepia(0.6) contrast(1.2) brightness(0.9) saturate(1.4); }
-        video { transform: scaleX(-1); object-fit: cover; width: 100%; height: 100%; position: absolute; top:0; left:0; }
-        .btn-capture { width: 70px; height: 70px; border: 5px solid white; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        /* Filtres de base */
+        .f-vintage { filter: sepia(0.5) contrast(1.1); }
+        .f-bw { filter: grayscale(1); }
+        /* Filtres Premium */
+        .f-gold { filter: brightness(1.2) sepia(0.3) saturate(1.8) contrast(1.1); }
+        .f-cyber { filter: hue-rotate(290deg) saturate(2.5) contrast(1.2); }
+        
+        video { object-fit: cover; width: 100%; height: 100%; position: absolute; top:0; left:0; transition: all 0.4s ease; }
+        .premium-border { border: 2px solid #facc15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.5); }
+        .page { display: none; height: 100%; animation: slideUp 0.3s ease-out; }
+        .active-page { display: flex; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="bg-black text-white font-sans h-screen flex flex-col overflow-hidden">
-    <header class="p-4 border-b border-zinc-800 flex justify-between items-center z-10 bg-black/50">
-        <h1 class="text-xl font-bold tracking-tighter">FLASH<span class="text-yellow-400">CAM</span></h1>
-        <div class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded">PREMIUM ACTIVE</div>
-    </header>
 
-    <main class="relative flex-1 bg-zinc-900">
-        <video id="v" autoplay playsinline></video>
-        <div class="absolute bottom-8 w-full flex flex-col items-center gap-4 z-10">
-            <div class="flex gap-4 mb-2">
-                <span class="bg-black/40 px-3 py-1 rounded-full text-[10px] border border-white/20">Filtre Vintage</span>
+    <div id="ad-banner" class="bg-gradient-to-r from-purple-600 to-blue-600 text-[10px] py-1 text-center font-bold z-">
+        🚀 PASSE AU PREMIUM POUR ENLEVER LA PUB ET DÉBLOQUER LES FILTRES GOLD !
+    </div>
+
+    <div id="cam-page" class="page active-page flex-col relative">
+        <header class="absolute top-0 w-full p-6 flex justify-between items-center z-50">
+            <div class="flex flex-col">
+                <span class="text-2xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">FLASHCAM</span>
+                <span id="status-tag" class="text-[8px] bg-white/20 px-2 py-0.5 rounded-full w-fit">VERSION GRATUITE</span>
             </div>
-            <button onclick="alert('Photo enregistrée dans le Cloud !')" class="btn-capture active:scale-90 transition-transform"></button>
-        </div>
-    </main>
-
-    <nav class="bg-black border-t border-zinc-800 p-4 flex justify-around items-center z-10">
-        <div class="flex flex-col items-center"><span class="text-xl">📷</span><span class="text-[9px] mt-1">Camera</span></div>
-        <div class="flex flex-col items-center text-zinc-500"><span class="text-xl">💬</span><span class="text-[9px] mt-1">Chat</span></div>
-        <div class="flex flex-col items-center text-zinc-500"><span class="text-xl">👤</span><span class="text-[9px] mt-1">Profil</span></div>
-    </nav>
-
-    <script>
-        const v = document.getElementById('v');
-        navigator.mediaDevices.getUserMedia({video: {facingMode: "user"}})
-        .then(s => { v.srcObject = s; v.classList.add('filter-vintage'); })
-        .catch(e => alert("Veuillez autoriser la caméra pour utiliser FlashCam."));
-    </script>
-</body>
-</html>
+            <div class="flex gap-3">
+                <button onclick="switchCam()" class="bg-black/40 backdrop-blur-lg p-3 rounded-2xl border border-white/10">🔄</button>
+                <button onclick="togglePremium()" class="bg-yellow-400 text-black font-bold p-3 rounded-2xl shadow
