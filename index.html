@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlashCam - Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .filter-vintage { filter: sepia(0.6) contrast(1.2) brightness(0.9) saturate(1.4); }
+        video { transform: scaleX(-1); object-fit: cover; width: 100%; height: 100%; position: absolute; top:0; left:0; }
+        .btn-capture { width: 70px; height: 70px; border: 5px solid white; border-radius: 50%; background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="bg-black text-white font-sans h-screen flex flex-col overflow-hidden">
+    <header class="p-4 border-b border-zinc-800 flex justify-between items-center z-10 bg-black/50">
+        <h1 class="text-xl font-bold tracking-tighter">FLASH<span class="text-yellow-400">CAM</span></h1>
+        <div class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded">PREMIUM ACTIVE</div>
+    </header>
+
+    <main class="relative flex-1 bg-zinc-900">
+        <video id="v" autoplay playsinline></video>
+        <div class="absolute bottom-8 w-full flex flex-col items-center gap-4 z-10">
+            <div class="flex gap-4 mb-2">
+                <span class="bg-black/40 px-3 py-1 rounded-full text-[10px] border border-white/20">Filtre Vintage</span>
+            </div>
+            <button onclick="alert('Photo enregistrée dans le Cloud !')" class="btn-capture active:scale-90 transition-transform"></button>
+        </div>
+    </main>
+
+    <nav class="bg-black border-t border-zinc-800 p-4 flex justify-around items-center z-10">
+        <div class="flex flex-col items-center"><span class="text-xl">📷</span><span class="text-[9px] mt-1">Camera</span></div>
+        <div class="flex flex-col items-center text-zinc-500"><span class="text-xl">💬</span><span class="text-[9px] mt-1">Chat</span></div>
+        <div class="flex flex-col items-center text-zinc-500"><span class="text-xl">👤</span><span class="text-[9px] mt-1">Profil</span></div>
+    </nav>
+
+    <script>
+        const v = document.getElementById('v');
+        navigator.mediaDevices.getUserMedia({video: {facingMode: "user"}})
+        .then(s => { v.srcObject = s; v.classList.add('filter-vintage'); })
+        .catch(e => alert("Veuillez autoriser la caméra pour utiliser FlashCam."));
+    </script>
+</body>
+</html>
